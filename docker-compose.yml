@@ -3,9 +3,7 @@ version: "3.8"
 services:
 
   vpn-portal-backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USERNAME}/vpn-portal-backend:latest
     container_name: vpn-portal-backend
     restart: unless-stopped
     environment:
@@ -32,9 +30,7 @@ services:
       - "traefik.enable=false"   # No exponer directamente, solo via frontend
 
   vpn-portal-frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USERNAME}/vpn-portal-frontend:latest
     container_name: vpn-portal-frontend
     restart: unless-stopped
     depends_on:
