@@ -29,8 +29,10 @@ class AuthController(
         httpResponse: HttpServletResponse
     ): ApiResponse<UserInfo> {
         return try {
+            val uid = request.username.removeSuffix("@clsma.com.co").trim()
+
             val auth = authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(request.username, request.password)
+                UsernamePasswordAuthenticationToken(uid, request.password)
             )
             SecurityContextHolder.getContext().authentication = auth
 
@@ -41,13 +43,13 @@ class AuthController(
                 SecurityContextHolder.getContext()
             )
 
-            val ldapUser = ldapService.findUserByUid(request.username)
-            val hasProfile = vpnService.hasOvpnProfile(request.username)
+            val ldapUser = ldapService.findUserByUid(uid)
+            val hasProfile = vpnService.hasOvpnProfile(uid)
 
             ApiResponse(
                 success = true,
                 data = UserInfo(
-                    username = request.username,
+                    username = uid,
                     displayName = ldapUser?.cn ?: request.username,
                     email = ldapUser?.mail ?: "",
                     hasOvpnProfile = hasProfile
