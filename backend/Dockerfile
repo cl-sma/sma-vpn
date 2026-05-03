@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache docker-cli
 
 # El JAR ya viene compilado por GitHub Actions
-COPY build/libs/*.jar app.jar
+COPY target/*.jar app.jar
 
 EXPOSE 8080
 
