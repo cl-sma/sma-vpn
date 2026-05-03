@@ -7,7 +7,7 @@ services:
     environment:
       LDAP_URL: ldap://lldap:3890
       LDAP_BASE: dc=clsma,dc=com,dc=co
-      LDAP_BIND_DN: cn=admin,dc=clsma,dc=com,dc=co
+      LDAP_BIND_DN: uid=admin,ou=people,dc=clsma,dc=com,dc=co
       LDAP_BIND_PASSWORD: ${LLDAP_ADMIN_PASSWORD}
       OVPN_CLIENTS_PATH: /opt/services/auth/vpn/clients
       OPENVPN_VOLUME: /opt/services/auth/vpn
