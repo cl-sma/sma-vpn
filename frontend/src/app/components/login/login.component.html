@@ -1,0 +1,80 @@
+<div class="login-page">
+  <div class="grid-bg"></div>
+
+  <div class="login-card">
+    <div class="logo-area">
+      <div class="shield-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4L6 12V24C6 34.5 14.1 44.3 24 47C33.9 44.3 42 34.5 42 24V12L24 4Z" fill="currentColor" opacity="0.15"/>
+          <path d="M24 4L6 12V24C6 34.5 14.1 44.3 24 47C33.9 44.3 42 34.5 42 24V12L24 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M16 24L21 29L32 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand">
+        <span class="brand-name">CLSMA</span>
+        <span class="brand-subtitle">Portal VPN</span>
+      </div>
+    </div>
+
+    <h1 class="login-title">Acceso seguro</h1>
+    <p class="login-desc">Ingresa con tus credenciales institucionales</p>
+
+    <form class="login-form" (ngSubmit)="onSubmit()">
+      <div class="field-group">
+        <label for="username">Usuario</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 1114 0H3z"/>
+          </svg>
+          <input
+            id="username"
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            placeholder="tu.nombre"
+            autocomplete="username"
+            [disabled]="loading()"
+          />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/>
+          </svg>
+          <input
+            id="password"
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            [disabled]="loading()"
+          />
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="error-msg">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <button type="submit" class="login-btn" [disabled]="loading() || !username || !password">
+        @if (loading()) {
+          <span class="spinner"></span>
+          Verificando...
+        } @else {
+          Iniciar sesión
+        }
+      </button>
+    </form>
+
+    <p class="footer-note">¿Problemas de acceso? Contacta a tu administrador</p>
+  </div>
+</div>

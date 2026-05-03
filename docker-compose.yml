@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+
+  vpn-portal-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vpn-portal-backend
+    restart: unless-stopped
+    environment:
+      # LDAP — apunta a lldap en la misma red Docker
+      LDAP_URL: ldap://lldap:3890
+      LDAP_BASE: dc=clsma,dc=com,dc=co
+      LDAP_BIND_DN: cn=admin,dc=clsma,dc=com,dc=co
+      LDAP_BIND_PASSWORD: ${LLDAP_ADMIN_PASSWORD}
+      # Rutas de los .ovpn en el servidor
+      OVPN_CLIENTS_PATH: /opt/services/auth/vpn/clients
+      OPENVPN_VOLUME: /opt/services/auth/vpn
+      OPENVPN_IMAGE: kylemanna/openvpn
+      # CORS — dominio del frontend
+      CORS_ORIGINS: https://vpn.clsma.com.co
+    volumes:
+      # Acceso de lectura/escritura a los .ovpn generados
+      - /opt/services/auth/vpn:/opt/services/auth/vpn
+      # Docker socket para ejecutar docker run (generación de perfiles)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - identity_network
+      - dokploy-network
+    labels:
+      - "traefik.enable=false"   # No exponer directamente, solo via frontend
+
+  vpn-portal-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vpn-portal-frontend
+    restart: unless-stopped
+    depends_on:
+      - vpn-portal-backend
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vpn-portal.rule=Host(`vpn.clsma.com.co`)"
+      - "traefik.http.routers.vpn-portal.entrypoints=websecure"
+      - "traefik.http.routers.vpn-portal.tls=true"
+      - "traefik.http.services.vpn-portal.loadbalancer.server.port=80"
+
+networks:
+  identity_network:
+    external: true
+  dokploy-network:
+    external: true

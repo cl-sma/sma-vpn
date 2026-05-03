@@ -1,0 +1,17 @@
+spring:
+  ldap:
+    urls: ${LDAP_URL:ldap://lldap:3890}
+    base: ${LDAP_BASE:dc=clsma,dc=com,dc=co}
+    username: ${LDAP_BIND_DN:cn=admin,dc=clsma,dc=com,dc=co}
+    password: ${LDAP_BIND_PASSWORD:}
+
+app:
+  ovpn:
+    clients-path: ${OVPN_CLIENTS_PATH:/opt/services/auth/vpn/clients}
+    openvpn-volume: ${OPENVPN_VOLUME:/opt/services/auth/vpn}
+    docker-image: ${OPENVPN_IMAGE:kylemanna/openvpn}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200,https://vpn.clsma.com.co}
+
+server:
+  port: 8080

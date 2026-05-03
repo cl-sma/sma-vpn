@@ -1,0 +1,206 @@
+<div class="portal-page">
+  <div class="grid-bg"></div>
+
+  <!-- Header -->
+  <header class="portal-header">
+    <div class="header-inner">
+      <div class="logo-area">
+        <div class="shield-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4L6 12V24C6 34.5 14.1 44.3 24 47C33.9 44.3 42 34.5 42 24V12L24 4Z" fill="currentColor" opacity="0.15"/>
+            <path d="M24 4L6 12V24C6 34.5 14.1 44.3 24 47C33.9 44.3 42 34.5 42 24V12L24 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M16 24L21 29L32 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-name">CLSMA</span>
+          <span class="brand-sub">Portal VPN</span>
+        </div>
+      </div>
+
+      <div class="user-area">
+        <div class="user-info">
+          <span class="user-display">{{ auth.currentUser()?.displayName }}</span>
+          <span class="user-email">{{ auth.currentUser()?.email }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h7a1 1 0 100-2H4V5h6a1 1 0 100-2H3zm11.293 4.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L15.586 11H9a1 1 0 110-2h6.586l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+          Salir
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="portal-main">
+
+    <!-- Welcome banner -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1>Bienvenido, <span class="highlight">{{ auth.currentUser()?.displayName?.split(' ')[0] }}</span></h1>
+        <p>Gestiona tu acceso a la red privada de CLSMA desde aquí.</p>
+      </div>
+      @if (vpnStatus(); as status) {
+        <div class="server-badge" [class.online]="status.serverRunning" [class.offline]="!status.serverRunning">
+          <span class="status-dot"></span>
+          Servidor {{ status.serverRunning ? 'en línea' : 'fuera de línea' }}
+        </div>
+      }
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab() === 'download'" (click)="activeTab.set('download')">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+        </svg>
+        Perfil VPN
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'status'" (click)="activeTab.set('status'); loadStatus()">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+        </svg>
+        Estado
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'instructions'" (click)="activeTab.set('instructions')">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+        </svg>
+        Cómo conectarse
+      </button>
+    </div>
+
+    <!-- Tab: Download -->
+    @if (activeTab() === 'download') {
+      <div class="tab-content" @if>
+        <div class="download-card">
+          <div class="download-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <rect width="48" height="48" rx="12" fill="rgba(0,200,150,0.08)"/>
+              <path d="M24 14v14m0 0l-5-5m5 5l5-5M14 34h20" stroke="#00c896" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="download-info">
+            <h3>Perfil de configuración VPN</h3>
+            <p>Archivo <code>.ovpn</code> personalizado para tu cuenta. Úsalo en OpenVPN Connect en cualquier dispositivo.</p>
+            @if (!auth.currentUser()?.hasOvpnProfile) {
+              <span class="badge-generate">Se generará automáticamente</span>
+            }
+          </div>
+          <button class="download-btn" (click)="downloadProfile()" [disabled]="downloading()">
+            @if (downloading()) {
+              <span class="spinner"></span> Preparando...
+            } @else {
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+              </svg>
+              Descargar {{ auth.currentUser()?.username }}.ovpn
+            }
+          </button>
+        </div>
+
+        @if (downloadError()) {
+          <p class="error-inline">{{ downloadError() }}</p>
+        }
+
+        <div class="info-box">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+          </svg>
+          <p>Al conectarte usa tu <strong>email institucional</strong> como usuario y tu <strong>contraseña de Authentik</strong>.</p>
+        </div>
+      </div>
+    }
+
+    <!-- Tab: Status -->
+    @if (activeTab() === 'status') {
+      <div class="tab-content">
+        @if (vpnStatus(); as status) {
+          <div class="status-grid">
+            <div class="stat-card" [class.ok]="status.serverRunning" [class.err]="!status.serverRunning">
+              <div class="stat-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                </svg>
+              </div>
+              <div class="stat-body">
+                <span class="stat-label">Estado del servidor</span>
+                <span class="stat-value">{{ status.serverRunning ? 'En línea ✓' : 'Fuera de línea ✗' }}</span>
+              </div>
+            </div>
+
+            <div class="stat-card ok">
+              <div class="stat-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a4.002 4.002 0 00-3.001-3.875A5.5 5.5 0 0118 18v1h-2zM4 18v-1a5.5 5.5 0 015.001-4.875A4.002 4.002 0 004 18v1H2v-1z"/>
+                </svg>
+              </div>
+              <div class="stat-body">
+                <span class="stat-label">Clientes conectados</span>
+                <span class="stat-value">{{ status.connectedClients }}</span>
+              </div>
+            </div>
+
+            <div class="stat-card ok">
+              <div class="stat-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16A8 8 0 0010 2zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.559-.499-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.559.499.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z"/>
+                </svg>
+              </div>
+              <div class="stat-body">
+                <span class="stat-label">Dirección del servidor</span>
+                <span class="stat-value mono">{{ status.serverAddress }}</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="refresh-btn" (click)="loadStatus()">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"/>
+            </svg>
+            Actualizar estado
+          </button>
+        } @else {
+          <div class="loading-state">
+            <span class="spinner large"></span>
+            <p>Cargando estado del servidor...</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab: Instructions -->
+    @if (activeTab() === 'instructions') {
+      <div class="tab-content">
+        <div class="os-selector">
+          <button [class.active]="selectedOS() === 'windows'" (click)="selectedOS.set('windows')">Windows</button>
+          <button [class.active]="selectedOS() === 'macos'" (click)="selectedOS.set('macos')">macOS</button>
+          <button [class.active]="selectedOS() === 'android'" (click)="selectedOS.set('android')">Android</button>
+          <button [class.active]="selectedOS() === 'ios'" (click)="selectedOS.set('ios')">iOS</button>
+        </div>
+
+        <div class="steps-list">
+          @for (item of installSteps[selectedOS()]; track item.step) {
+            <div class="step-item">
+              <div class="step-num">{{ item.step }}</div>
+              <div class="step-body">
+                <h4>{{ item.title }}</h4>
+                <p>{{ item.desc }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="info-box">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+          </svg>
+          <p><strong>Usuario VPN:</strong> tu email ({{ auth.currentUser()?.email || 'usuario@clsma.com.co' }})<br>
+          <strong>Contraseña:</strong> tu contraseña de Authentik (la misma que usas en este portal)</p>
+        </div>
+      </div>
+    }
+  </main>
+</div>
