@@ -80,4 +80,4 @@ jobs:
     steps:
       - name: Trigger Dokploy redeploy
         run: |
-          curl -fsSL -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}"
+          curl -fsSLk -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}"
