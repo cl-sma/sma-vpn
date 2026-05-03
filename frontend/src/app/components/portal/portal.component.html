@@ -39,7 +39,7 @@
     <!-- Welcome banner -->
     <div class="welcome-banner">
       <div class="welcome-text">
-        <h1>Bienvenido, <span class="highlight">{{ auth.currentUser()?.displayName?.split(' ')[0] }}</span></h1>
+        <h1>Bienvenido, <span class="highlight">{{ (auth.currentUser()?.displayName?.split(' ') ?? [])[0] }}</span></h1>
         <p>Gestiona tu acceso a la red privada de CLSMA desde aquí.</p>
       </div>
       @if (vpnStatus(); as status) {
