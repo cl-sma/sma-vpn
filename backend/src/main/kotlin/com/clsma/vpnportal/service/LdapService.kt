@@ -15,17 +15,21 @@ data class LdapUser(
 @Service
 class LdapService(private val ldapTemplate: LdapTemplate) {
 
-    fun findUserByUid(uid: String): LdapUser? {
+    fun findUserByUid(uid: String): LdapUser? = searchUser("uid", uid)
+
+    fun findUserByMail(mail: String): LdapUser? = searchUser("mail", mail)
+
+    private fun searchUser(attr: String, value: String): LdapUser? {
         return try {
             val results = ldapTemplate.search(
                 query()
                     .base("ou=people")
-                    .where("uid").`is`(uid),
+                    .where(attr).`is`(value),
                 object : AbstractContextMapper<LdapUser>() {
                     override fun doMapFromContext(ctx: DirContextOperations): LdapUser {
                         return LdapUser(
-                            uid = ctx.getStringAttribute("uid") ?: uid,
-                            cn = ctx.getStringAttribute("cn") ?: uid,
+                            uid = ctx.getStringAttribute("uid") ?: value,
+                            cn = ctx.getStringAttribute("cn") ?: value,
                             mail = ctx.getStringAttribute("mail") ?: ""
                         )
                     }

@@ -29,7 +29,12 @@ class AuthController(
         httpResponse: HttpServletResponse
     ): ApiResponse<UserInfo> {
         return try {
-            val uid = request.username.removeSuffix("@clsma.com.co").trim()
+            val input = request.username.trim()
+            val uid = if (input.endsWith("@clsma.com.co")) {
+                ldapService.findUserByMail(input)?.uid ?: input.removeSuffix("@clsma.com.co")
+            } else {
+                input
+            }
 
             val auth = authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(uid, request.password)
