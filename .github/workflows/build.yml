@@ -82,4 +82,4 @@ jobs:
         run: |
           curl -fsSLk -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d '{"branch": "main"}'
+            -d '{"ref": "refs/heads/main"}'
